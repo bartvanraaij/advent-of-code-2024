@@ -80,7 +80,7 @@ fn part_2(input: &str) -> usize {
 
             // Try all combinations when deleting ONE level
             for i in 0..rep.len() {
-                let mut rep_copy = rep.iter().cloned().collect::<Vec<usize>>();
+                let mut rep_copy = rep.to_vec();
                 rep_copy.remove(i);
                 if is_safe_report(&rep_copy) {
                     return true;
