@@ -30,30 +30,68 @@ fn part_1(input: &str) -> usize {
 
     let num_safe_reports: usize = reports
         .iter()
-        .filter_map(|rep| {
-            if rep.is_sorted() {
-                return Some(rep.clone());
-            }
-
-            if rep.into_iter().rev().is_sorted() {
-                let reversed = rep.iter().rev().cloned();
-                return Some(reversed.collect::<Vec<usize>>());
-            }
-
-            return None;
-        })
         .filter(|rep| {
-            rep.iter().tuple_windows().all(|(a, b)| {
-                return b - a >= 1 && b - a <= 3;
-            })
+            is_safe_report(rep)
         })
         .count();
 
     return num_safe_reports;
 }
 
+fn is_safe_report(report: &Vec<usize>) -> bool {
+    return report.iter().tuple_windows().all(|(a, b, c)| {
+        if a == b || b == c {
+            return false;
+        }
+        if a > b && b < c || a < b && b > c {
+            return false;
+        }
+
+        if !(a.abs_diff(*b) >= 1 && a.abs_diff(*b) <= 3) {
+            return false;
+        }
+
+        if !(b.abs_diff(*c) >= 1 && b.abs_diff(*c) <= 3) {
+            return false;
+        }
+
+        return true;
+    });
+}
+
 fn part_2(input: &str) -> usize {
-    0
+    let reports: Vec<Vec<usize>> = input
+        .split("\n")
+        .filter(|l| !l.is_empty())
+        .map(|line| {
+            return line
+                .split_whitespace()
+                .map(|n| n.parse::<usize>().unwrap())
+                .collect();
+        })
+        .collect();
+
+    let num_safe_reports: usize = reports
+        .iter()
+        .filter(|rep| {
+            if is_safe_report(rep) {
+                return true;
+            }
+
+            // Try all combinations when deleting ONE level
+            for i in 0..rep.len() {
+                let mut rep_copy = rep.iter().cloned().collect::<Vec<usize>>();
+                rep_copy.remove(i);
+                if is_safe_report(&rep_copy) {
+                    return true;
+                }
+            }
+            return false;
+
+        })
+        .count();
+
+    return num_safe_reports;
 }
 
 #[cfg(test)]
@@ -76,6 +114,6 @@ mod tests_00 {
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part_2(SAMPLE_DATA), 0);
+        assert_eq!(part_2(SAMPLE_DATA), 4);
     }
 }
