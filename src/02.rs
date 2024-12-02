@@ -2,7 +2,7 @@ use itertools::Itertools;
 use std::{env, fs};
 
 fn read_input_file(args: Vec<String>) -> String {
-    let default_input_filename = &String::from("input/02");
+    let default_input_filename = &String::from("input/02.txt");
     let input_filepath: &str = args.get(1).unwrap_or(default_input_filename);
     fs::read_to_string(input_filepath).expect("input file should be readable")
 }
@@ -17,9 +17,39 @@ fn main() {
 }
 
 fn part_1(input: &str) -> usize {
-    //input.split("\n").filter(|l| !l.is_empty()).map(|line| {});
+    let reports: Vec<Vec<usize>> = input
+        .split("\n")
+        .filter(|l| !l.is_empty())
+        .map(|line| {
+            return line
+                .split_whitespace()
+                .map(|n| n.parse::<usize>().unwrap())
+                .collect();
+        })
+        .collect();
 
-    0
+    let num_safe_reports: usize = reports
+        .iter()
+        .filter_map(|rep| {
+            if rep.is_sorted() {
+                return Some(rep.clone());
+            }
+
+            if rep.into_iter().rev().is_sorted() {
+                let reversed = rep.iter().rev().cloned();
+                return Some(reversed.collect::<Vec<usize>>());
+            }
+
+            return None;
+        })
+        .filter(|rep| {
+            rep.iter().tuple_windows().all(|(a, b)| {
+                return b - a >= 1 && b - a <= 3;
+            })
+        })
+        .count();
+
+    return num_safe_reports;
 }
 
 fn part_2(input: &str) -> usize {

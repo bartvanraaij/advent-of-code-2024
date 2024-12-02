@@ -2,7 +2,7 @@ use itertools::Itertools;
 use std::{env, fs};
 
 fn read_input_file(args: Vec<String>) -> String {
-    let default_input_filename = &String::from("input/00");
+    let default_input_filename = &String::from("input/00.txt");
     let input_filepath: &str = args.get(1).unwrap_or(default_input_filename);
     fs::read_to_string(input_filepath).expect("input file should be readable")
 }
