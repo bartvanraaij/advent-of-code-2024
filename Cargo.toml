@@ -2,6 +2,7 @@
 name = "advent-of-code-2024"
 version = "0.1.0"
 edition = "2021"
+authors = ["Bart van Raaij <info@bartvanraaij.nl>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,10 +19,10 @@ name = "03"
 path = "src/03.rs"
 
 [dependencies]
-cached = "0.46.1"
+cached = "0.54.0"
 im = "15.1.0"
 indicatif = "0.17.7"
-itertools = "0.12.0"
+itertools = "0.13.0"
 num = "0.4.1"
 rayon = "1.10.0"
 regex = "1.10.2"

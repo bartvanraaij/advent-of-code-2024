@@ -27,7 +27,7 @@ fn part_2(input: &str) -> usize {
 }
 
 #[cfg(test)]
-mod tests_00 {
+mod tests {
     use super::*;
 
     const SAMPLE_DATA: &str = r#"
