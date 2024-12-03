@@ -37,23 +37,23 @@ fn part_1(input: &str) -> usize {
 fn part_2(input: &str) -> usize {
     let lines: Vec<&str> = input.split("\n").filter(|l| !l.is_empty()).collect();
 
-    let mut active = true;
+    let mut enabled = true;
     let mut sum = 0;
-    let mul_regex = Regex::new(r"(mul|don't|do)\(((\d{1,3}),(\d{1,3}))?\)").unwrap();
+    let instr_regex = Regex::new(r"(mul|don't|do)\(((\d{1,3}),(\d{1,3}))?\)").unwrap();
 
     for line in lines {
-        for cap in mul_regex.captures_iter(line) {
+        for cap in instr_regex.captures_iter(line) {
             let keyword = cap.get(1).unwrap().as_str();
 
             if keyword == "do" {
-                active = true;
+                enabled = true;
             }
 
             if keyword == "don't" {
-                active = false;
+                enabled = false;
             }
 
-            if keyword == "mul" && active {
+            if enabled && keyword == "mul" {
                 let a = cap.get(3).unwrap().as_str().parse::<usize>().unwrap();
                 let b = cap.get(4).unwrap().as_str().parse::<usize>().unwrap();
                 sum += a * b;
