@@ -14,6 +14,9 @@ fn main() {
 
     let result_part_2 = part_2(&input);
     println!("{:?}", result_part_2);
+
+    let result_part_2_alt = part_2_alt(&input);
+    println!("{:?}", result_part_2_alt);
 }
 
 fn part_1(input: &str) -> usize {
@@ -64,6 +67,41 @@ fn part_2(input: &str) -> usize {
     sum
 }
 
+fn part_2_alt(input: &str) -> usize {
+    let instructions = input
+        .split("\n")
+        .filter(|l| !l.is_empty())
+        .collect::<Vec<&str>>()
+        .join("");
+
+    let instr_regex = Regex::new(r"(mul|don't|do)\(((\d{1,3}),(\d{1,3}))?\)").unwrap();
+    let mut enabled = true;
+
+    instr_regex
+        .captures_iter(instructions.as_str())
+        .filter_map(|cap| {
+            let keyword = cap.get(1).unwrap().as_str();
+
+            match (keyword, enabled) {
+                ("do", false) => {
+                    enabled = true;
+                    None
+                }
+                ("don't", true) => {
+                    enabled = false;
+                    None
+                }
+                ("mul", true) => {
+                    let a = cap.get(3).unwrap().as_str().parse::<usize>().unwrap();
+                    let b = cap.get(4).unwrap().as_str().parse::<usize>().unwrap();
+                    Some(a * b)
+                }
+                _ => None,
+            }
+        })
+        .sum()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -84,5 +122,10 @@ xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
     #[test]
     fn test_part_2() {
         assert_eq!(part_2(SAMPLE_DATA_2), 48);
+    }
+
+    #[test]
+    fn test_part_2_alt() {
+        assert_eq!(part_2_alt(SAMPLE_DATA_2), 48);
     }
 }
