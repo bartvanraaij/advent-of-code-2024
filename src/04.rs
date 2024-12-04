@@ -50,13 +50,13 @@ impl Puzzle {
         let xrange: Box<dyn ExactSizeIterator<Item = i32>> = match direction {
             Direction::N | Direction::S => Box::new(iter::repeat_n(x, l as usize)),
             Direction::SW | Direction::W | Direction::NW => Box::new((x - l + 1..x + 1).rev()),
-            Direction::NE | Direction::E | Direction::SE => Box::new(x..(x + l + 1)),
+            Direction::NE | Direction::E | Direction::SE => Box::new(x..x + l),
         };
 
         let yrange: Box<dyn ExactSizeIterator<Item = i32>> = match direction {
             Direction::W | Direction::E => Box::new(iter::repeat_n(y, l as usize)),
-            Direction::NE | Direction::N | Direction::NW => Box::new(((y - l + 1)..y + 1).rev()),
-            Direction::SE | Direction::S | Direction::SW => Box::new(y..(y + l)),
+            Direction::NE | Direction::N | Direction::NW => Box::new((y - l + 1..y + 1).rev()),
+            Direction::SE | Direction::S | Direction::SW => Box::new(y..y + l),
         };
 
         zip(xrange, yrange)
@@ -69,14 +69,14 @@ impl Puzzle {
         let x = xy.0;
         let y = xy.1;
 
-        let adjecent_positions: Vec<XY> = Vec::from([
+        let adjacent_positions: Vec<XY> = Vec::from([
             XY(x - 1, y - 1),
             XY(x + 1, y - 1),
             XY(x + 1, y + 1),
             XY(x - 1, y + 1),
         ]);
 
-        adjecent_positions
+        adjacent_positions
             .iter()
             .map(|xy| self.char_at(*xy))
             .collect::<Vec<String>>()
