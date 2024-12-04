@@ -8,7 +8,7 @@ use strum_macros::EnumIter;
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 struct XY(i32, i32);
 
-#[derive(Debug, EnumIter)]
+#[derive(Debug, EnumIter, Clone, Copy)]
 enum Direction {
     N,
     NE,
@@ -123,15 +123,12 @@ fn part_1(input: &str) -> usize {
         .values()
         .filter(|char| char.char.to_string() == "X")
         .map(|char| {
-            let mut count = 0;
-            for direction in Direction::iter() {
-                let word = puzzle.get_word_at_location(char.pos, direction, None);
-
-                if word == "XMAS" {
-                    count += 1;
-                }
-            }
-            count
+            Direction::iter()
+                .filter(|direction| {
+                    let word = puzzle.get_word_at_location(char.pos, *direction, None);
+                    word == "XMAS"
+                })
+                .count()
         })
         .sum()
 }
@@ -143,15 +140,11 @@ fn part_2(input: &str) -> usize {
         .chars
         .values()
         .filter(|char| char.char.to_string() == "A")
-        .map(|char| {
-            let mut count = 0;
+        .filter(|char| {
             let word = puzzle.get_xmas_at_location(char.pos);
-            if word == "MSSM" || word == "SSMM" || word == "SMMS" || word == "MMSS" {
-                count += 1
-            };
-            count
+            word == "MSSM" || word == "SSMM" || word == "SMMS" || word == "MMSS" 
         })
-        .sum()
+        .count()
 }
 
 #[cfg(test)]
