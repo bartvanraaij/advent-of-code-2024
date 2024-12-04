@@ -18,6 +18,10 @@ path = "src/02.rs"
 name = "03"
 path = "src/03.rs"
 
+[[bin]]
+name = "04"
+path = "src/04.rs"
+
 [dependencies]
 cached = "0.54.0"
 im = "15.1.0"
@@ -26,6 +30,8 @@ itertools = "0.13.0"
 num = "0.4.1"
 rayon = "1.10.0"
 regex = "1.10.2"
+strum = "0.26.3"
+strum_macros = "0.26.4"
 
 [profile.release]
 strip = "symbols"
