@@ -58,15 +58,18 @@ fn parse_input(input: &str) -> (Rules, Vec<Vec<usize>>) {
         .collect_tuple()
         .unwrap();
 
-    let mut rules = Rules::new();
-    for line in rule_lines {
-        let (num, must_precede) = line
-            .split("|")
-            .map(|n| n.parse::<usize>().unwrap())
-            .collect_tuple()
-            .unwrap();
-        rules.add_num_rule(num, must_precede);
-    }
+    let rules = rule_lines
+        .iter()
+        .map(|line| {
+            line.split("|")
+                .map(|n| n.parse::<usize>().unwrap())
+                .collect_tuple()
+                .unwrap()
+        })
+        .fold(Rules::new(), |mut rules, (num, must_precede)| {
+            rules.add_num_rule(num, must_precede);
+            rules
+        });
 
     let update_nums = update_lines
         .iter()
@@ -100,7 +103,7 @@ fn part_1(input: &str) -> usize {
             return true;
         })
         .map(|update| update.get(update.len() / 2).unwrap())
-        .sum::<usize>();
+        .sum();
 
     correct_updates
 }
