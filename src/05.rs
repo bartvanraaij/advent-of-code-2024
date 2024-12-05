@@ -1,5 +1,7 @@
 use itertools::Itertools;
-use std::{env, fs};
+use std::cmp::Ordering::Greater;
+use std::cmp::Ordering::Less;
+use std::{collections::HashMap, env, fs};
 
 fn read_input_file(args: Vec<String>) -> String {
     let default_input_filename = &String::from("input/05.txt");
@@ -16,14 +18,115 @@ fn main() {
     println!("{:?}", result_part_2);
 }
 
-fn part_1(input: &str) -> usize {
-    //input.split("\n").filter(|l| !l.is_empty()).map(|line| {});
+#[derive(Debug)]
+struct Rules {
+    rules: HashMap<usize, Vec<usize>>,
+}
 
-    0
+impl Rules {
+    fn new() -> Self {
+        Self {
+            rules: HashMap::new(),
+        }
+    }
+
+    fn add_num_rule(&mut self, num: usize, must_precede: usize) {
+        if self.rules.contains_key(&num) {
+            self.rules.get_mut(&num).unwrap().push(must_precede);
+        } else {
+            self.rules.insert(num, Vec::from([must_precede]));
+        }
+    }
+
+    fn num_must_precede_num(&self, num: usize, must_precede: usize) -> bool {
+        self.rules
+            .get(&num)
+            .unwrap_or(&vec![])
+            .contains(&must_precede)
+    }
+}
+
+fn parse_input(input: &str) -> (Rules, Vec<Vec<usize>>) {
+    let (rule_lines, update_lines) = input
+        .split("\n\n")
+        .map(|lines| {
+            lines
+                .split("\n")
+                .filter(|l| !l.is_empty())
+                .collect::<Vec<_>>()
+        })
+        .collect_tuple()
+        .unwrap();
+
+    let mut rules = Rules::new();
+    for line in rule_lines {
+        let (num, must_precede) = line
+            .split("|")
+            .map(|n| n.parse::<usize>().unwrap())
+            .collect_tuple()
+            .unwrap();
+        rules.add_num_rule(num, must_precede);
+    }
+
+    let update_nums = update_lines
+        .iter()
+        .map(|line| {
+            line.split(",")
+                .map(|n| n.parse::<usize>().unwrap())
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+
+    (rules, update_nums)
+}
+
+fn part_1(input: &str) -> usize {
+    let (rules, updates) = parse_input(input);
+
+    let correct_updates = updates
+        .iter()
+        .filter(|update| {
+            for (i, num) in update.iter().enumerate() {
+                if rules.rules.contains_key(num) {
+                    let must_follow = rules.rules.get(num).unwrap();
+
+                    for preceding_num in &update[0..=i] {
+                        if must_follow.contains(preceding_num) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        })
+        .map(|update| update.get(update.len() / 2).unwrap())
+        .sum::<usize>();
+
+    correct_updates
 }
 
 fn part_2(input: &str) -> usize {
-    0
+    let (rules, mut updates) = parse_input(input);
+
+    updates
+        .iter_mut()
+        .filter(|update| {
+            !update
+                .is_sorted_by(|num, following_num| rules.num_must_precede_num(*num, *following_num))
+        })
+        .map(|update| {
+            update.sort_by(|num, following_num| {
+                if rules.num_must_precede_num(*num, *following_num) {
+                    Less
+                } else {
+                    Greater
+                }
+            });
+
+            update
+        })
+        .map(|update| update.get(update.len() / 2).unwrap())
+        .sum()
 }
 
 #[cfg(test)]
@@ -68,6 +171,6 @@ mod tests {
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part_2(SAMPLE_DATA), 0);
+        assert_eq!(part_2(SAMPLE_DATA), 123);
     }
 }
